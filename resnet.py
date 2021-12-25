@@ -47,9 +47,9 @@ class Net(nn.Module):
 
         self.max_pool_3 = nn.MaxPool2d(2, 2)
 
-        self.fc1 = nn.Linear(9408, 1568)
-        self.fc2 = nn.Linear(1568, 1568)
-        self.fc3 = nn.Linear(1568, 10)
+        self.fc1 = nn.Linear(1728, 432)
+        self.fc2 = nn.Linear(432, 108)
+        self.fc3 = nn.Linear(108, 10)
 
     def forward(self, x):
         x = self.conv1(x)
