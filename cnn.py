@@ -65,15 +65,12 @@ class Net(nn.Module):
 
         x = self.conv3(x)
         x = self.relu3(x)
-        x = self.bn3(x)
 
         x = self.conv4(x)
         x = self.relu4(x)
-        x = self.bn4(x)
 
         x = self.conv5(x)
         x = self.relu5(x)
-        x = self.bn5(x)
 
         x = self.max_pool_3(x)
 
@@ -99,7 +96,7 @@ if __name__ == "__main__":
         ]
     )
 
-    batch_size = 256
+    batch_size = 500
     EPOCH = 100
 
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
@@ -163,9 +160,9 @@ if __name__ == "__main__":
 
     print('Finished Training')
     plt.plot(epoch_list, running_loss_list)
-    plt.title("loss of epoch")
+    plt.title("loss.png of epoch")
     plt.xlabel("epoch")
-    plt.ylabel("loss")
+    plt.ylabel("loss.png")
     plt.show()
 
     time2 = time.time()

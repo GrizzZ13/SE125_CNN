@@ -1,3 +1,4 @@
 .idea/*
 data/*
-./cifar_net.pth
+cifar_net.pth
+model/*
