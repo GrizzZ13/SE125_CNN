@@ -15,7 +15,7 @@ transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-batch_size = 5
+batch_size = 32
 
 train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
                                          download=True, transform=transform)
@@ -60,15 +60,22 @@ class Net(nn.Module):
     def __init__(self):
         super().__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
+        self.relu1 = nn.ReLU()
+        self.max_pool_1 = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
+        self.relu2 = nn.ReLU()
+        self.max_pool_2 = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.conv1(x)
+        x = self.relu1(x)
+        x = self.max_pool_1(x)
+        x = self.conv2(x)
+        x = self.relu2(x)
+        x = self.max_pool_2(x)
         x = torch.flatten(x, 1)  # flatten all dimensions except batch
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
@@ -88,7 +95,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 # train
 time1 = time.time()
-for epoch in range(2):  # loop over the dataset multiple times
+for epoch in range(10):  # loop over the dataset multiple times
 
     running_loss = 0.0
     for i, data in enumerate(train_loader, 0):
