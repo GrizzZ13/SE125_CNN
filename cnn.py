@@ -36,7 +36,7 @@ def img_show(img):
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
         self.relu1 = nn.ReLU()
         self.bn1 = nn.BatchNorm2d(16)
         # self.max_pool_1 = nn.MaxPool2d(3, 2)
@@ -48,21 +48,18 @@ class Net(nn.Module):
 
         self.conv3 = nn.Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.relu3 = nn.ReLU()
-        self.bn3 = nn.BatchNorm2d(128)
 
         self.conv4 = nn.Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.relu4 = nn.ReLU()
-        self.bn4 = nn.BatchNorm2d(256)
 
         self.conv5 = nn.Conv2d(256, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.relu5 = nn.ReLU()
-        self.bn5 = nn.BatchNorm2d(192)
 
         self.max_pool_3 = nn.MaxPool2d(2, 2)
 
-        self.fc1 = nn.Linear(1728, 432)
-        self.fc2 = nn.Linear(432, 108)
-        self.fc3 = nn.Linear(108, 10)
+        self.fc1 = nn.Linear(9408, 1568)
+        self.fc2 = nn.Linear(1568, 1568)
+        self.fc3 = nn.Linear(1568, 10)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -77,15 +74,12 @@ class Net(nn.Module):
 
         x = self.conv3(x)
         x = self.relu3(x)
-        x = self.bn3(x)
 
         x = self.conv4(x)
         x = self.relu4(x)
-        x = self.bn4(x)
 
         x = self.conv5(x)
         x = self.relu5(x)
-        x = self.bn5(x)
 
         x = self.max_pool_3(x)
 
@@ -93,7 +87,6 @@ class Net(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
-
         return x
 
 
@@ -112,7 +105,7 @@ if __name__ == "__main__":
         ]
     )
 
-    batch_size = 256
+    batch_size = 500
     EPOCH = 100
 
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
@@ -179,9 +172,9 @@ if __name__ == "__main__":
 
     print('Finished Training')
     plt.plot(epoch_list, running_loss_list)
-    plt.title("loss of epoch")
+    plt.title("loss.png of epoch")
     plt.xlabel("epoch")
-    plt.ylabel("loss")
+    plt.ylabel("loss.png")
     plt.show()
 
     time2 = time.time()

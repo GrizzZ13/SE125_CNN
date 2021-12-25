@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # 超参数设置
     EPOCH = 100  # 遍历数据集次数
     pre_epoch = 0  # 定义已经遍历数据集的次数
-    BATCH_SIZE = 128  # 批处理尺寸(batch_size)
+    BATCH_SIZE = 256  # 批处理尺寸(batch_size)
     LR = 0.01  # 学习率
 
     # 准备数据集并预处理
@@ -104,13 +104,12 @@ if __name__ == "__main__":
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True,
-                                            transform=transform_train)  # 训练数据集
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True,
-                                              num_workers=2)  # 生成一个个batch进行批训练，组成batch的时候顺序打乱取
+    trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)  #
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2,
+                                              pin_memory=True)  # 生成一个个batch进行批训练，组成batch的时候顺序打乱取
 
     testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+    testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2, pin_memory=True)
     # Cifar-10的标签
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
@@ -132,6 +131,7 @@ if __name__ == "__main__":
                 print('\nEpoch: %d' % (epoch + 1))
                 net.train()
                 sum_loss = 0.0
+                sum_i = 0.0
                 correct = 0.0
                 total = 0.0
                 for i, data in enumerate(trainloader, 0):
@@ -149,15 +149,15 @@ if __name__ == "__main__":
 
                     # 每训练1个batch打印一次loss和准确率
                     sum_loss += loss.item()
+                    sum_i = i + 1
                     _, predicted = torch.max(outputs.data, 1)
                     total += labels.size(0)
                     correct += predicted.eq(labels.data).cpu().sum()
-                    print('[epoch:%d, iter:%d] Loss: %.03f | Acc: %.3f%% '
-                          % (epoch + 1, (i + 1 + epoch * length), sum_loss / (i + 1), 100. * correct / total))
-                    f2.write('%03d  %05d | Loss: %.03f | Acc: %.3f%% '
-                             % (epoch + 1, (i + 1 + epoch * length), sum_loss / (i + 1), 100. * correct / total))
-                    f2.write('\n')
-                    f2.flush()
+
+                f2.write('%03d  %05d | Loss: %.03f | Acc: %.3f%% '
+                         % (epoch + 1, (sum_i + epoch * length), sum_loss / sum_i, 100. * correct / total))
+                f2.write('\n')
+                f2.flush()
 
                 # 每训练完一个epoch测试一下准确率
                 print("Waiting Test!")
