@@ -14,6 +14,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import torch.optim as optim
+import matplotlib.pyplot as plt
 
 
 def img_show(img):
@@ -64,12 +65,15 @@ class Net(nn.Module):
 
         x = self.conv3(x)
         x = self.relu3(x)
+        x = self.bn3(x)
 
         x = self.conv4(x)
         x = self.relu4(x)
+        x = self.bn4(x)
 
         x = self.conv5(x)
         x = self.relu5(x)
+        x = self.bn5(x)
 
         x = self.max_pool_3(x)
 
@@ -130,9 +134,12 @@ if __name__ == "__main__":
 
     # train
     time1 = time.time()
+    running_loss_list = []
+    epoch_list = []
     for epoch in range(EPOCH):  # loop over the dataset multiple times
-
+        print(epoch)
         running_loss = 0.0
+        num = 0
         for i, data in enumerate(train_loader, 0):
             # get the inputs; data is a list of [inputs, labels]
             # use GPU
@@ -150,11 +157,16 @@ if __name__ == "__main__":
 
             # print statistics
             running_loss += loss.item()
-            if i % 100 == 100:  # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 100))
-                running_loss = 0.0
+            num += 1
+        running_loss_list.append(running_loss / num)
+        epoch_list.append(epoch)
 
     print('Finished Training')
+    plt.plot(epoch_list, running_loss_list)
+    plt.title("loss of epoch")
+    plt.xlabel("epoch")
+    plt.ylabel("loss")
+    plt.show()
 
     time2 = time.time()
     print(time2 - time1)
