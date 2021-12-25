@@ -26,10 +26,10 @@ def img_show(img):
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=(7, 7))
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))
         self.relu1 = nn.ReLU()
         self.bn1 = nn.BatchNorm2d(16)
-        self.max_pool_1 = nn.MaxPool2d(3, 2)
+        # self.max_pool_1 = nn.MaxPool2d(3, 2)
 
         self.conv2 = nn.Conv2d(16, 64, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
         self.relu2 = nn.ReLU()
@@ -38,24 +38,27 @@ class Net(nn.Module):
 
         self.conv3 = nn.Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.relu3 = nn.ReLU()
+        self.bn3 = nn.BatchNorm2d(128)
 
         self.conv4 = nn.Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.relu4 = nn.ReLU()
+        self.bn4 = nn.BatchNorm2d(256)
 
         self.conv5 = nn.Conv2d(256, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.relu5 = nn.ReLU()
+        self.bn5 = nn.BatchNorm2d(192)
 
         self.max_pool_3 = nn.MaxPool2d(2, 2)
 
-        self.fc1 = nn.Linear(192 * 2 * 2, 768)
-        self.fc2 = nn.Linear(768, 96)
-        self.fc3 = nn.Linear(96, 10)
+        self.fc1 = nn.Linear(1728, 432)
+        self.fc2 = nn.Linear(432, 108)
+        self.fc3 = nn.Linear(108, 10)
 
     def forward(self, x):
         x = self.conv1(x)
         x = self.relu1(x)
         x = self.bn1(x)
-        x = self.max_pool_1(x)
+        # x = self.max_pool_1(x)
 
         x = self.conv2(x)
         x = self.relu2(x)
@@ -76,7 +79,7 @@ class Net(nn.Module):
         x = torch.flatten(x, 1)  # flatten all dimensions except batch
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = F.softmax(self.fc3(x), dim=1)
         return x
 
 
@@ -91,9 +94,9 @@ if __name__ == "__main__":
         [
             transforms.RandomHorizontalFlip(0.5),
             transforms.RandomVerticalFlip(0.5),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ])
+            transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ]
+    )
 
     batch_size = 256
     EPOCH = 100
@@ -150,8 +153,8 @@ if __name__ == "__main__":
 
             # print statistics
             running_loss += loss.item()
-            if i % 2000 == 1999:  # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
+            if i % 100 == 100:  # print every 2000 mini-batches
+                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 100))
                 running_loss = 0.0
 
     print('Finished Training')
