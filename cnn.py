@@ -88,8 +88,12 @@ if __name__ == "__main__":
     # load cifar-10 data set
     ssl._create_default_https_context = ssl._create_unverified_context
     transform = transforms.Compose(
-        [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        [
+            transforms.RandomHorizontalFlip(0.5),
+            transforms.RandomVerticalFlip(0.5),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
 
     batch_size = 256
     EPOCH = 100
@@ -127,7 +131,7 @@ if __name__ == "__main__":
     # train
     time1 = time.time()
     for epoch in range(EPOCH):  # loop over the dataset multiple times
-
+        print(epoch)
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             # get the inputs; data is a list of [inputs, labels]
