@@ -24,13 +24,13 @@ def img_show(img):
     plt.show()
 
 
-def zca_whitening(inputs):
-    inputs = inputs.cpu().numpy()
-    sigma = np.dot(inputs, inputs.T) / inputs.shape[1]  # inputs是经过归一化处理的，所以这边就相当于计算协方差矩阵
-    U, S, V = np.linalg.svd(sigma)  # 奇异分解
-    epsilon = 0.1  # 白化的时候，防止除数为0
-    ZCAMatrix = np.dot(np.dot(U, np.diag(1.0 / np.sqrt(np.diag(S) + epsilon))), U.T)  # 计算zca白化矩阵
-    return torch.from_numpy(np.dot(ZCAMatrix, inputs))  # 白化变换
+# def zca_whitening(inputs):
+#     inputs = inputs.cpu().numpy()
+#     sigma = np.dot(inputs, inputs.T) / inputs.shape[1]  # inputs是经过归一化处理的，所以这边就相当于计算协方差矩阵
+#     U, S, V = np.linalg.svd(sigma)  # 奇异分解
+#     epsilon = 0.1  # 白化的时候，防止除数为0
+#     ZCAMatrix = np.dot(np.dot(U, np.diag(1.0 / np.sqrt(np.diag(S) + epsilon))), U.T)  # 计算zca白化矩阵
+#     return torch.from_numpy(np.dot(ZCAMatrix, inputs))  # 白化变换
 
 
 class Net(nn.Module):
