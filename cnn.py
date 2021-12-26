@@ -4,6 +4,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import ssl
+from torchsummary import summary
 
 # show some of the training images
 import matplotlib.pyplot as plt
@@ -133,6 +134,7 @@ if __name__ == "__main__":
     net = Net()
     # use GPU
     net.to(device)
+    summary(net, input_size=[(3, 32, 32)], batch_size=500, device="cuda")
 
     # Loss Function
     criterion = nn.CrossEntropyLoss()
