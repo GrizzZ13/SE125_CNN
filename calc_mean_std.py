@@ -25,18 +25,31 @@ if __name__ == "__main__":
                                              download=True, transform=transforms.ToTensor())
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
                                                shuffle=True, num_workers=2, pin_memory=True)
+    test_set = torchvision.datasets.CIFAR10(root='./data', train=False,
+                                            download=True, transform=transforms.ToTensor())
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size,
+                                              shuffle=False, num_workers=0)
 
     print(len(train_set))
 
     # get some random training images
     data_iter = iter(train_loader)
     images, labels = data_iter.next()
-    mm = torch.ones(256, 3, 32, 32).to(device)
+    mm = torch.ones(256, 3, 32, 32)
     print(mm.shape)
     for i, data in enumerate(train_loader, 0):
         # get the inputs; data is a list of [inputs, labels]
         # use GPU
-        inputs, labels = data[0].to(device), data[1].to(device)
+        inputs, labels = data[0], data[1]
+        print("inputs")
+        print(inputs.shape)
+        mm = torch.cat([mm, inputs], 0)
+        print(mm.shape)
+
+    for i, data in enumerate(test_loader, 0):
+        # get the inputs; data is a list of [inputs, labels]
+        # use GPU
+        inputs, labels = data[0], data[1]
         print("inputs")
         print(inputs.shape)
         mm = torch.cat([mm, inputs], 0)
@@ -44,8 +57,8 @@ if __name__ == "__main__":
 
     nb_samples = 0.
     # 创建3维的空列表
-    channel_mean = torch.zeros(3).to(device)
-    channel_std = torch.zeros(3).to(device)
+    channel_mean = torch.zeros(3)
+    channel_std = torch.zeros(3)
     print(mm.shape)
     N, C, H, W = mm.shape[:4]
     mm = mm.view(N, C, -1)  # 将w,h维度的数据展平，为batch,channel,data,然后对三个维度上的数分别求和和标准差
