@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # 超参数设置
     EPOCH = 100  # 遍历数据集次数
     pre_epoch = 0  # 定义已经遍历数据集的次数
-    BATCH_SIZE = 128  # 批处理尺寸(batch_size)
+    BATCH_SIZE = 256  # 批处理尺寸(batch_size)
     LR = 0.01  # 学习率
 
     # 准备数据集并预处理
@@ -96,12 +96,12 @@ if __name__ == "__main__":
         transforms.RandomCrop(32, padding=4),  # 先四周填充0，在吧图像随机裁剪成32*32
         transforms.RandomHorizontalFlip(),  # 图像一半的概率翻转，一半的概率不翻转
         transforms.ToTensor(),
-        transforms.Normalize((0.4940, 0.4849, 0.4495), (0.2014, 0.1985, 0.2001)),  # R,G,B每层的归一化用到的均值和方差
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),  # R,G,B每层的归一化用到的均值和方差
     ])
 
     transform_test = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.4940, 0.4849, 0.4495), (0.2014, 0.1985, 0.2001)),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
     trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)  #
