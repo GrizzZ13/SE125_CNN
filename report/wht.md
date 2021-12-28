@@ -4,14 +4,12 @@
 
 具体地，我们通过概率水平翻转和竖直翻转给定的PIL图像来人工地增大数据集
 
-```
+```python
 transforms.RandomHorizontalFlip(0.5),
 transforms.RandomVerticalFlip(0.5),
 ```
 
 此外，我们还使用transforms.ToTensor()将数据分布调整到（0，1）之间，并使用Normalize进行计算，将数据归一化到（-1,1）之间，从而让数据更加贴合正态分布。
-
-
 
 ## II. 系统设计
 
@@ -55,9 +53,11 @@ Shallow CNN model是我们最开始尝试的模型，它的网络设计和PyTorc
 
 #### C. ResNet-18
 
-经历了ElexNet的成功后，我们仍然觉得79%的测试准确率仍然有些低。这时，我们将目光投向了被称为CNN图像史上里程碑的ResCNN，期望能达到更高的准确率。根据ResNet论文中给出的结构列表，我们搭建了18层的RNN网络。下图是ResNet-18模型的详细结构。
+经历了ElexNet的成功后，我们仍然觉得79%的测试准确率仍然有些低。
 
-<img src="E:\SE125_CNN\report\ResNet-18.png" alt="ResNet-18" style="zoom:67%;" />
+这时，我们将目光投向了被称为CNN图像史上里程碑的ResCNN，期望能达到更高的准确率。根据ResNet论文中给出的结构列表，我们搭建了18层的RNN网络。下图是ResNet-18模型的详细结构。
+
+<img src="ResNet-18.png" alt="ResNet-18" style="zoom:67%;" />
 
 ResNet-18由17层卷积层和1个全连接层组成。网络中存在两种不同的基本块：一种是在通道数不变的情况下，进行的残差结构运算，如上图中实线标注的跳跃连接部分；另一种则是在进行残差结构运算时，发生了通道数改变，如上图中虚线部分所示。我们分别将他们作为不同的基本块。在卷积操作都完成后，通过平均池化avgpool层最终到达全连接层。此外我们还对图像预处理的参数进行了一些优化，使得数据分布更加正则。
 
@@ -119,7 +119,7 @@ ElexNet在最佳情况下的预测准确率为79%
 
 下图为最初版本ElexNet的模型参数，在这组模型参数下调整Batch Size，以epoch=100的条件运行，得到的结果在Cifar-10测试集上的准确率为70%
 
-![](70-args.png)
+<img src="70-args.png" style="zoom:50%;" />
 
 | plane | car   | bird  | cat   | deer  | dog   | frog  | horse | ship  | truck | total |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
@@ -133,7 +133,7 @@ ElexNet在最佳情况下的预测准确率为79%
 
 针对上述问题，我们调整了模型参数，作出一些改进，在对每个卷积层都增加了卷积核的数量，使用更多的参数进行非线性函数的拟合。
 
-![](72-args.png)
+<img src="72-args.png" style="zoom:50%;" />
 
 | plane | car   | bird  | cat   | deer  | dog   | frog  | horse | ship  | truck | total |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
@@ -145,7 +145,7 @@ ElexNet在最佳情况下的预测准确率为79%
 
 考虑到Cifar-10数据集的自身尺寸小的特点，我们进行了针对性的调整，删除了第一个卷积层后的池化层，原因是Cifar-10本身为$32*32*3$，在小尺寸的数据集上进行池化会损失较多图片信息。删除第一层池化层之后，模型对于图像细节信息的提取更强，可以提高分类能力。
 
-![](77-args.png)
+<img src="77-args.png" style="zoom: 50%;" />
 
 | plane | car   | bird  | cat   | deer  | dog   | frog  | horse | ship  | truck | total |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
@@ -157,9 +157,9 @@ ElexNet在最佳情况下的预测准确率为79%
 
 为了进一步优化分类效果，我们又对这个模型进行了探究。经过仔细探究发现，第一层的卷积层stride=1 kernel_size=7 padding=0，这样的卷积核参数导致我们损失了图像边缘的部分信息，为此我们喧杂再次修改参数，为第一层卷积层增加大小为3的padding，以充分利用边缘的信息。在这样的参数条件下，模型的预测准确率达到了79%，相较于不加padding提升了2%。
 
-![](79-args.png)
+<img src="79-args.png" style="zoom:50%;" />
 
-<h5>e.</h5>
+##### e.
 
 我们还调整了学习率分别进行了多次测试
 
@@ -225,17 +225,17 @@ ElexNet在最佳情况下的预测准确率为79%
 
 
 
-<h3>ResNet-18</h3>
+### 3. ResNet-18
 
-<h4>A. 预测准确率</h4>
+#### A. 预测准确率
 
 ResNet-18在最佳情况下的预测准确率高达92.35%
 
-<h4>B. 训练过程</h4>
+#### B. 训练过程
 
 下图给出了**最终版本**ResNet-18在最佳情况时的loss变化，从图中可以看到，在训练之初，loss下降很快，随着epoch不断增大，loss下降速度逐渐放缓，并最终趋于平稳状态。
 
-![ElexNetLoss](ElexNetLoss.png)
+<img src="ResNetLoss.png" alt="ResNetLoss" style="zoom:67%;" />
 
 
 
@@ -243,9 +243,148 @@ ResNet-18在最佳情况下的预测准确率高达92.35%
 
 <img src="ResNet_accuracy.png" alt="ResNet_accuracy" style="zoom:60%;" />
 
-<h4>C. 调参实验及结果分析</h4>
+#### C. 调参实验及结果分析
 
+针对ResNet18，我们调整了模型的学习率进行测试，但是结果没有显著差异，因此不在此赘述
 
+Residual Block:
 
-<h4>D. 参数量</h4>
+```python
+class ResidualBlock(nn.Module):
+    def __init__(self, in_channel, out_channel, stride=1):
+        super(ResidualBlock, self).__init__()
+        self.left = nn.Sequential(
+            nn.Conv2d(in_channel, out_channel, kernel_size=(3, 3), stride=(stride, stride), padding=(1, 1), bias=False),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channel, out_channel, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
+            nn.BatchNorm2d(out_channel)
+        )
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_channel != out_channel:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_channel, out_channel, kernel_size=(1, 1), stride=(stride, stride), bias=False),
+                nn.BatchNorm2d(out_channel)
+            )
+
+    def forward(self, x):
+        out = self.left(x)
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
+```
+
+ResNet main body:
+
+```python
+class ResNet(nn.Module):
+    def __init__(self, residual_block, num_classes=10):
+        super(ResNet, self).__init__()
+        self.in_channel = 64
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+        )
+        self.layer1 = self.make_layer(residual_block, 64, 2, stride=1)
+        self.layer2 = self.make_layer(residual_block, 128, 2, stride=2)
+        self.layer3 = self.make_layer(residual_block, 256, 2, stride=2)
+        self.layer4 = self.make_layer(residual_block, 512, 2, stride=2)
+        self.fc = nn.Linear(512, num_classes)
+
+    def make_layer(self, block, channels, num_blocks, stride):
+        strides = [stride] + [1] * (num_blocks - 1)  # strides=[1,1]
+        layers = []
+        for stride in strides:
+            layers.append(block(self.in_channel, channels, stride))
+            self.in_channel = channels
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out)
+        out = F.avg_pool2d(out, 4)
+        out = out.view(out.size(0), -1)
+        out = self.fc(out)
+        return out
+```
+
+#### D. 参数量
+
+```
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1          [500, 64, 32, 32]           1,728
+       BatchNorm2d-2          [500, 64, 32, 32]             128
+              ReLU-3          [500, 64, 32, 32]               0
+            Conv2d-4          [500, 64, 32, 32]          36,864
+       BatchNorm2d-5          [500, 64, 32, 32]             128
+              ReLU-6          [500, 64, 32, 32]               0
+            Conv2d-7          [500, 64, 32, 32]          36,864
+       BatchNorm2d-8          [500, 64, 32, 32]             128
+     ResidualBlock-9          [500, 64, 32, 32]               0
+           Conv2d-10          [500, 64, 32, 32]          36,864
+      BatchNorm2d-11          [500, 64, 32, 32]             128
+             ReLU-12          [500, 64, 32, 32]               0
+           Conv2d-13          [500, 64, 32, 32]          36,864
+      BatchNorm2d-14          [500, 64, 32, 32]             128
+    ResidualBlock-15          [500, 64, 32, 32]               0
+           Conv2d-16         [500, 128, 16, 16]          73,728
+      BatchNorm2d-17         [500, 128, 16, 16]             256
+             ReLU-18         [500, 128, 16, 16]               0
+           Conv2d-19         [500, 128, 16, 16]         147,456
+      BatchNorm2d-20         [500, 128, 16, 16]             256
+           Conv2d-21         [500, 128, 16, 16]           8,192
+      BatchNorm2d-22         [500, 128, 16, 16]             256
+    ResidualBlock-23         [500, 128, 16, 16]               0
+           Conv2d-24         [500, 128, 16, 16]         147,456
+      BatchNorm2d-25         [500, 128, 16, 16]             256
+             ReLU-26         [500, 128, 16, 16]               0
+           Conv2d-27         [500, 128, 16, 16]         147,456
+      BatchNorm2d-28         [500, 128, 16, 16]             256
+    ResidualBlock-29         [500, 128, 16, 16]               0
+           Conv2d-30           [500, 256, 8, 8]         294,912
+      BatchNorm2d-31           [500, 256, 8, 8]             512
+             ReLU-32           [500, 256, 8, 8]               0
+           Conv2d-33           [500, 256, 8, 8]         589,824
+      BatchNorm2d-34           [500, 256, 8, 8]             512
+           Conv2d-35           [500, 256, 8, 8]          32,768
+      BatchNorm2d-36           [500, 256, 8, 8]             512
+    ResidualBlock-37           [500, 256, 8, 8]               0
+           Conv2d-38           [500, 256, 8, 8]         589,824
+      BatchNorm2d-39           [500, 256, 8, 8]             512
+             ReLU-40           [500, 256, 8, 8]               0
+           Conv2d-41           [500, 256, 8, 8]         589,824
+      BatchNorm2d-42           [500, 256, 8, 8]             512
+    ResidualBlock-43           [500, 256, 8, 8]               0
+           Conv2d-44           [500, 512, 4, 4]       1,179,648
+      BatchNorm2d-45           [500, 512, 4, 4]           1,024
+             ReLU-46           [500, 512, 4, 4]               0
+           Conv2d-47           [500, 512, 4, 4]       2,359,296
+      BatchNorm2d-48           [500, 512, 4, 4]           1,024
+           Conv2d-49           [500, 512, 4, 4]         131,072
+      BatchNorm2d-50           [500, 512, 4, 4]           1,024
+    ResidualBlock-51           [500, 512, 4, 4]               0
+           Conv2d-52           [500, 512, 4, 4]       2,359,296
+      BatchNorm2d-53           [500, 512, 4, 4]           1,024
+             ReLU-54           [500, 512, 4, 4]               0
+           Conv2d-55           [500, 512, 4, 4]       2,359,296
+      BatchNorm2d-56           [500, 512, 4, 4]           1,024
+    ResidualBlock-57           [500, 512, 4, 4]               0
+           Linear-58                  [500, 10]           5,130
+================================================================
+Total params: 11,173,962
+Trainable params: 11,173,962
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 5.86
+Forward/backward pass size (MB): 6812.54
+Params size (MB): 42.63
+Estimated Total Size (MB): 6861.02
+----------------------------------------------------------------
+```
 
