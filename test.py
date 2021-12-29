@@ -2,7 +2,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import ssl
-from cnn import Net
+from elexnet import Net
 from resnet import ResNet18
 
 if __name__ == "__main__":
