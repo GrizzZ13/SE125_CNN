@@ -1,22 +1,7 @@
-import time
-
 import torch
 import torchvision
 import torchvision.transforms as transforms
 import ssl
-from torchsummary import summary
-
-# show some of the training images
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Convolutional Neural Network
-import torch.nn as nn
-import torch.nn.functional as F
-
-import torch.optim as optim
-import matplotlib.pyplot as plt
-
 from cnn import Net
 from resnet import ResNet18
 
@@ -30,34 +15,31 @@ if __name__ == "__main__":
 
             # load cifar-10 data set
             ssl._create_default_https_context = ssl._create_unverified_context
-            transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-            ])
+            transform = transforms.Compose(
+                [
+                    transforms.RandomHorizontalFlip(0.5),
+                    transforms.RandomVerticalFlip(0.5),
+                    transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                ]
+            )
 
-            batch_size = 500
-            EPOCH = 100
-
-            train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                                     download=True, transform=transform)
-            train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
-                                                       shuffle=True, num_workers=2, pin_memory=True)
+            batch_size = 256
 
             test_set = torchvision.datasets.CIFAR10(root='./data', train=False,
                                                     download=True, transform=transform)
             test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size,
-                                                      shuffle=False, num_workers=0)
+                                                      shuffle=False, num_workers=2)
             classes = ('plane', 'car', 'bird', 'cat',
                        'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
-            PATH = "./model/net_099.pth"
+            PATH = "./trained_model/model_elexnet.pth"
 
             # test the model on test set
             data_iter = iter(test_loader)
             images, labels = data_iter.next()
 
             # load back the trained model
-            net = ResNet18()
+            net = Net()
             net.load_state_dict(torch.load(PATH))
             # output
             outputs = net(images)
@@ -112,22 +94,16 @@ if __name__ == "__main__":
                 transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
             ])
 
-            batch_size = 500
-            EPOCH = 100
-
-            train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                                     download=True, transform=transform)
-            train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
-                                                       shuffle=True, num_workers=2, pin_memory=True)
+            batch_size = 256
 
             test_set = torchvision.datasets.CIFAR10(root='./data', train=False,
                                                     download=True, transform=transform)
             test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size,
-                                                      shuffle=False, num_workers=0)
+                                                      shuffle=False, num_workers=2)
             classes = ('plane', 'car', 'bird', 'cat',
                        'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
-            PATH = "./model/net_099.pth"
+            PATH = "./trained_model/model_resnet.pth"
 
             # test the model on test set
             data_iter = iter(test_loader)
